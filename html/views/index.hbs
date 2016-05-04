@@ -1,0 +1,120 @@
+{{#extend "styles"}}
+    <style>
+        .logo {
+            display: none;
+        }
+        
+        .bg {
+            background-image: url('img/bg.jpg');
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center; 
+            background-size: 100%;
+            margin: 20px;
+            
+            font: normal normal normal 17px/1.4em din-next-w01-light,din-next-w02-light,din-next-w10-light,sans-serif;
+            color: #605E5E;
+        }
+        
+        .box {
+            margin-left: 37%;
+        }
+        
+        .box .text {
+            width: 70%;
+        }
+        
+        .box .action {
+            margin-left: 12%;
+            margin-top: 20%;
+        }
+        
+        
+        .bigGreenButton{
+            border-radius: 5px;
+            width:350px;
+            background-color:#60a74a;
+            padding: 10px;
+            text-align:center;
+        }
+        
+        .bigGreenButton a{
+            font-family:'TradeGothic LT CondEighteen';
+            font-size:18px;
+            color:white;
+            font-weight:bold;
+            text-transform:uppercase;
+            text-decoration:none;
+        }
+        
+        .bigGreenButton a:hover {
+            background-color:#cccccc;
+        }
+
+
+        @media (max-width: 600px) {
+            .logo {
+                display: block;
+                width: 100%;
+            }
+            
+            .logo img {
+                width: 100%;
+            }
+            
+            .bg {
+                background-image: none;
+            }
+            
+            .box {
+                margin-left: 0;
+            }
+            
+            .box .text {
+                width: 100%;
+            }
+            
+            .bigGreenButton {
+                width: 90%;
+                margin: 5px;
+            }
+            
+            .box .action {
+                margin-left: 0;
+                margin-top: 0;
+            }
+        }
+    </style>
+{{/extend}}
+
+
+<script>document.body.className = 'bg';</script>
+
+<div class="logo"><img src="img/bg.jpg"></div>
+<section class="box">
+    <h1>Postcards Bot</h1>
+    <div class="text">
+        <p>
+            Hello!<br />
+            I'm a Postcards Bot..<br />
+            I work inside the Telegram Messenger<br />
+            How are you?
+        </p>
+        
+        <p>Ping ping…</p>
+        
+        <p>
+            Upload a photo… ping
+            Write a message…
+            Enter address details..
+        <p>
+        
+        <p>
+            I will Print it with high resolution on a 4x6 in (10x15 cm) paper Postcard and send it to any place on Earth.. all for $2.99
+        </p>
+    </div>
+    
+    <div class="action">
+        <div class="bigGreenButton"><a href="https://telegram.me/postcards_bot">start</a></div>
+    </div>
+<section>
