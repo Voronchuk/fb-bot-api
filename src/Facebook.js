@@ -32,14 +32,7 @@ class Facebook extends EventEmitter {
         this.bot = new Bot(config);
         this.bot.on('error', (error) => {
             this.emit('error', error);    
-            console.log('error', error);
         });
-        
-        this.on('message', (sender, message) => {
-            console.log(sender, message);
-            
-            this.bot.sendText(sender.id, 'Great!');
-        })
     }
     
     getRouter() {
