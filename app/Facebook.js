@@ -59,13 +59,6 @@ var Facebook = function (_EventEmitter) {
         _this2.bot = new Bot(config);
         _this2.bot.on('error', function (error) {
             _this2.emit('error', error);
-            console.log('error', error);
-        });
-
-        _this2.on('message', function (sender, message) {
-            console.log(sender, message);
-
-            _this2.bot.sendText(sender.id, 'Great!');
         });
         return _this2;
     }
