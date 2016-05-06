@@ -93,7 +93,7 @@ var Bot = function (_EventEmitter) {
         key: 'send',
         value: function send(message) {
             var data = message.getData();
-            debug(data);
+            debug(JSON.stringify(data));
             return this._call(this.config.FB_MESSAGE_URL, data);
         }
     }, {

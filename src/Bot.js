@@ -66,7 +66,7 @@ class Bot extends EventEmitter {
     
     send(message) {
         let data = message.getData();
-        debug(data);
+        debug(JSON.stringify(data));
         return this._call(this.config.FB_MESSAGE_URL, data);
     }
     
