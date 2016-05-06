@@ -65,7 +65,9 @@ class Bot extends EventEmitter {
     
     
     send(message) {
-        return this._call(this.config.FB_MESSAGE_URL, message.getData());
+        let data = message.getData();
+        debug(data);
+        return this._call(this.config.FB_MESSAGE_URL, data);
     }
     
     sendText(userId, text, keyboardOptions = null) {
