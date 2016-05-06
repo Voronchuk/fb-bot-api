@@ -1,6 +1,6 @@
 {
   "name": "fb-bot-api",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "API wrapper to communicate with Facebook Messenger Bots",
   "author": "Vyacheslav Voronchuk",
   "repository": "voronchuk/fb-bot-api",
