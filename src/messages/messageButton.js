@@ -11,11 +11,6 @@ module.exports = class MessageButton {
     constructor(type, title, url = '') {
         this.type = type;
         this.title = title;
-
-        if (!url) {
-            url = title;
-        }
-
         this.url = url;
     }
 
@@ -29,7 +24,7 @@ module.exports = class MessageButton {
 
         switch (this.type) {
             case 'postback':
-                result['payload'] = this.url;
+                result['payload'] = this.title;
                 break;
                 
             case 'web_url':
