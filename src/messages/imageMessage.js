@@ -1,62 +1,41 @@
 'use strict';
 
-const fs = require('fs');
-
-/**
- *
- * Class ImageMessage
- * @recipient : String $userID
- * @file : String $path local or weburl
- *
- */
+const _ = require('lodash');
 
 module.exports = class ImageMessage {
-  constructor(recipient, file){
-    this.recipient = recipient;
-    this.file = file;
-  }
-
-  getData() {
-    let res = {
-      recipient :  {
-        id : this.recipient
-      }
-    };
-
-    if (this.file.indexOf('http://') === 0 || this.file.indexOf('https://') === 0) {
-
-      // Url
-
-      res['message'] = {
-        attachment : {
-          type : "image",
-          payload : {
-            url : this.file
-          }
-        }
-      };
-
-    } else {
-
-      // Local file
-
-      res['message'] = {
-        attachment : {
-          type : "image",
-          payload : {}
-        }
-
-      };
-
-      res['filedata'] = this._getLocalFile(this.file);
+    constructor(recipient, file) {
+        this.recipient = recipient;
+        this.file = file;
     }
 
-    return res;
-  }
+    getData() {
+        let res = {
+            recipient: {
+                id: this.recipient
+            }
+        };
 
-  _getLocalFile(path){
-    // FIXME: error handler and upload
-    let value = fs.readFileSync(path);
-    return value;
-  }
+        if (_.isString(this.file) && this.file.match(/^https?:\/\//)) {
+            // Url
+            res['message'] = {
+                attachment : {
+                    type : "image",
+                    payload : {
+                        url : this.file
+                    }
+                }
+            };
+        } 
+        else {
+            // Local file
+            res['message'] = {
+                attachment : {
+                    type : "image",
+                    payload : {}
+                }
+            };
+            res['filedata'] = this.file;
+        }
+        return res;
+    }
 };

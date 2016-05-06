@@ -24,10 +24,10 @@ gulp.task('clean', function(cb) {
 // Compile ES6 with Babel
 gulp.task('src', ['clean'], function () {
     return gulp.src(paths.src)
-        .pipe(sourcemaps.init())
+        //.pipe(sourcemaps.init())
         .pipe(babel())
         //.pipe(concat('all.js'))
-        .pipe(sourcemaps.write('.'))
+        //.pipe(sourcemaps.write('.'))
         .pipe(gulp.dest('app'));
 });
 

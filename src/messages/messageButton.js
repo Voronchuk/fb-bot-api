@@ -1,8 +1,5 @@
 'use strict';
 
-const config = require('../config');
-
-
 /**
  * MessageButton constructor.
  *
@@ -10,13 +7,12 @@ const config = require('../config');
  * @param $title Title
  * @param string $url Url or postback
  */
-
 module.exports = class MessageButton {
-    constructor(type, title, url = ''){
+    constructor(type, title, url = '') {
         this.type = type;
         this.title = title;
 
-        if(!url){
+        if (!url) {
             url = title;
         }
 
@@ -31,17 +27,16 @@ module.exports = class MessageButton {
             title: this.title
         };
 
-        switch (this.type){
+        switch (this.type) {
             case 'postback':
                 result['payload'] = this.url;
                 break;
+                
             case 'web_url':
                 result['url'] = this.url;
                 break;
         }
 
         return result;
-
     }
 }
-

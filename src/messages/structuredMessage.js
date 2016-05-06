@@ -53,7 +53,8 @@ module.exports = class StructuredMessage {
                 }
             }
         };
-        switch (this.type){
+        
+        switch (this.type) {
             case 'button':
                 result['attachment']['payload']['text'] = this.title;
                 result['attachment']['payload']['buttons'] = [];
@@ -90,6 +91,7 @@ module.exports = class StructuredMessage {
                 }
                 break;
         }
+        
         return {
             recipient: {
                 id: this.recipient
@@ -98,4 +100,3 @@ module.exports = class StructuredMessage {
         }
     }
 }
-
