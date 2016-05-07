@@ -18,9 +18,11 @@ module.exports = class StructuredMessage {
                 this.title = data['text'];
                 this.buttons = data['buttons'];
                 break;
+                
             case 'generic':
                 this.elements = data['elements'];
                 break;
+                
             case 'receipt':
                 this.recipient_name = data['recipient_name'];
                 this.order_number = data['order_number'];
@@ -43,7 +45,10 @@ module.exports = class StructuredMessage {
      */
     getData(){
         let result;
-        let btns;
+        let btns = [];
+        let elements = [];
+        let element = {};
+        let i = 0, j = 0;
 
         result = {
             attachment: {
@@ -59,17 +64,22 @@ module.exports = class StructuredMessage {
                 result['attachment']['payload']['text'] = this.title;
                 result['attachment']['payload']['buttons'] = [];
                 btns = this.buttons;
-                for(let i = 0; i < btns.length; i++){
+                for(i = 0; i < btns.length; i++) {
                     result['attachment']['payload']['buttons'][i] = btns[i].getData();
-                };
-                break;
-            case 'generic':
-                result['attachment']['payload']['elements'] = [];
-                btns = this.elements;
-                for(let i = 0; i < btns.length; i++){
-                    result['attachment']['payload']['elements'][i] = btns[i].getData();
                 }
                 break;
+                
+            case 'generic':
+                result['attachment']['payload']['elements'] = this.elements.map((element) => {
+                    if (element.buttons && element.buttons.length) {
+                        element.buttons = element.buttons.map((button) => {
+                            return button.getData();
+                        });
+                    }
+                    return element;
+                });
+                break;
+                
             case 'receipt':
                 result['attachment']['payload']['recipient_name'] = this.recipient_name;
                 result['attachment']['payload']['order_number'] = this.order_number;

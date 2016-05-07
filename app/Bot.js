@@ -1,5 +1,7 @@
 'use strict';
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -99,19 +101,70 @@ var Bot = function (_EventEmitter) {
     }, {
         key: 'sendText',
         value: function sendText(userId, text) {
+            var _this4 = this;
+
             var keyboardOptions = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
 
             if (keyboardOptions) {
-                return this.send(new StructuredMessage(userId, 'button', {
-                    text: text,
-                    buttons: keyboardOptions.map(function (buttonOptions) {
+                var _ret = function () {
+                    var toButtonConfig = function toButtonConfig(buttonOptions) {
                         if (buttonOptions.type === 'web_url') {
                             return new MessageButton(buttonOptions.type, buttonOptions.label, buttonOptions.content);
                         } else {
                             return new MessageButton(buttonOptions.type, buttonOptions.label);
                         }
-                    })
-                }));
+                    };
+
+                    // Cut message to horizontal blocks with 3 buttons
+                    if (keyboardOptions.length > 3) {
+                        var _ret2 = function () {
+                            var elements = [],
+                                temparray = [];
+                            var element = {};
+
+                            keyboardOptions = keyboardOptions.reduce(function (acc, button, index) {
+                                if (index % 3 === 0) {
+                                    acc.push([button]);
+                                } else {
+                                    acc[acc.length - 1].push(button);
+                                }
+                                return acc;
+                            }, []);
+
+                            elements = keyboardOptions.map(function (buttons, index) {
+                                element = {
+                                    buttons: buttons.map(toButtonConfig)
+                                };
+                                if (index === 0) {
+                                    element.title = text;
+                                }
+                            });
+
+                            debug(elements);
+                            return {
+                                v: {
+                                    v: _this4.send(new StructuredMessage(userId, 'generic', {
+                                        elements: elements
+                                    }))
+                                }
+                            };
+                        }();
+
+                        if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
+                    }
+
+                    // Normal message with up to 3 buttons
+                    else {
+                            return {
+                                v: _this4.send(new StructuredMessage(userId, 'button', {
+                                    text: text,
+                                    buttons: keyboardOptions.map(toButtonConfig)
+                                }))
+                            };
+                        }
+                }();
+
+                if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
             } else {
                 return this.send(new Message(userId, text));
             }
@@ -119,7 +172,7 @@ var Bot = function (_EventEmitter) {
     }, {
         key: 'sendImage',
         value: function sendImage(userId, filePath) {
-            var _this4 = this;
+            var _this5 = this;
 
             return new Promise(function (resolve, reject) {
                 fs.readFile(filePath, function (error, data) {
@@ -130,13 +183,13 @@ var Bot = function (_EventEmitter) {
                     resolve(data);
                 });
             }).then(function (data) {
-                return _this4.send(new ImageMessage(userId, data));
+                return _this5.send(new ImageMessage(userId, data));
             });
         }
     }, {
         key: '_call',
         value: function _call(url, data) {
-            var _this5 = this;
+            var _this6 = this;
 
             var type = arguments.length <= 2 || arguments[2] === undefined ? 'POST' : arguments[2];
 
@@ -165,7 +218,7 @@ var Bot = function (_EventEmitter) {
 
                 return Promise.resolve(data);
             }).catch(function (error) {
-                _this5.emit('error', error);
+                _this6.emit('error', error);
 
                 return Promise.reject(BotError.wrap(error));
             });

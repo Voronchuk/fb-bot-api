@@ -24,9 +24,11 @@ module.exports = function () {
                 this.title = data['text'];
                 this.buttons = data['buttons'];
                 break;
+
             case 'generic':
                 this.elements = data['elements'];
                 break;
+
             case 'receipt':
                 this.recipient_name = data['recipient_name'];
                 this.order_number = data['order_number'];
@@ -53,7 +55,11 @@ module.exports = function () {
         key: 'getData',
         value: function getData() {
             var result = void 0;
-            var btns = void 0;
+            var btns = [];
+            var elements = [];
+            var element = {};
+            var i = 0,
+                j = 0;
 
             result = {
                 attachment: {
@@ -69,17 +75,22 @@ module.exports = function () {
                     result['attachment']['payload']['text'] = this.title;
                     result['attachment']['payload']['buttons'] = [];
                     btns = this.buttons;
-                    for (var i = 0; i < btns.length; i++) {
+                    for (i = 0; i < btns.length; i++) {
                         result['attachment']['payload']['buttons'][i] = btns[i].getData();
-                    };
-                    break;
-                case 'generic':
-                    result['attachment']['payload']['elements'] = [];
-                    btns = this.elements;
-                    for (var _i = 0; _i < btns.length; _i++) {
-                        result['attachment']['payload']['elements'][_i] = btns[_i].getData();
                     }
                     break;
+
+                case 'generic':
+                    result['attachment']['payload']['elements'] = this.elements.map(function (element) {
+                        if (element.buttons && element.buttons.length) {
+                            element.buttons = element.buttons.map(function (button) {
+                                return button.getData();
+                            });
+                        }
+                        return element;
+                    });
+                    break;
+
                 case 'receipt':
                     result['attachment']['payload']['recipient_name'] = this.recipient_name;
                     result['attachment']['payload']['order_number'] = this.order_number;
@@ -89,15 +100,15 @@ module.exports = function () {
                     result['attachment']['payload']['timestamp'] = this.timestamp;
                     result['attachment']['payload']['elements'] = [];
                     btns = this.elements;
-                    for (var _i2 = 0; _i2 < btns.length; _i2++) {
-                        result['attachment']['payload']['elements'][_i2] = btns[_i2].getData();
+                    for (var _i = 0; _i < btns.length; _i++) {
+                        result['attachment']['payload']['elements'][_i] = btns[_i].getData();
                     }
                     result['attachment']['payload']['address'] = this.address.getData();
                     result['attachment']['payload']['summary'] = this.summary.getData();
                     result['attachment']['payload']['adjustments'] = [];
                     var adj = this.adjustments;
-                    for (var _i3 = 0; _i3 < adj.length; _i3++) {
-                        result['attachment']['payload']['adjustments'][_i3] = adj[_i3].getData();
+                    for (var _i2 = 0; _i2 < adj.length; _i2++) {
+                        result['attachment']['payload']['adjustments'][_i2] = adj[_i2].getData();
                     }
                     break;
             }

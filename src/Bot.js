@@ -72,17 +72,52 @@ class Bot extends EventEmitter {
     
     sendText(userId, text, keyboardOptions = null) {
         if (keyboardOptions) {
-            return this.send(new StructuredMessage(userId, 'button', {
-                text: text,
-                buttons: keyboardOptions.map((buttonOptions) => {
-                    if (buttonOptions.type === 'web_url') {
-                        return new MessageButton(buttonOptions.type, buttonOptions.label, buttonOptions.content);
+            const toButtonConfig = (buttonOptions) => {
+                if (buttonOptions.type === 'web_url') {
+                    return new MessageButton(buttonOptions.type, buttonOptions.label, buttonOptions.content);
+                }
+                else {
+                    return new MessageButton(buttonOptions.type, buttonOptions.label);
+                }
+            };
+            
+            // Cut message to horizontal blocks with 3 buttons
+            if (keyboardOptions.length > 3) {
+                let elements = [], temparray = [];
+                let element = {};
+
+                keyboardOptions = keyboardOptions.reduce((acc, button, index) => {
+                    if (index % 3 === 0) {
+                        acc.push([button]);
                     }
                     else {
-                        return new MessageButton(buttonOptions.type, buttonOptions.label);
+                        acc[acc.length - 1].push(button);
                     }
-                })     
-            }));
+                    return acc;
+                }, []);
+                
+                elements = keyboardOptions.map((buttons, index) => {
+                    element = {
+                        buttons: buttons.map(toButtonConfig)
+                    };
+                    if (index === 0) {
+                        element.title = text;
+                    }
+                });
+
+                debug(elements);
+                return this.send(new StructuredMessage(userId, 'generic', {
+                    elements: elements      
+                }));
+            }
+            
+            // Normal message with up to 3 buttons
+            else {
+                return this.send(new StructuredMessage(userId, 'button', {
+                    text: text,
+                    buttons: keyboardOptions.map(toButtonConfig)     
+                }));
+            }
         }
         else {
             return this.send(new Message(userId, text));
