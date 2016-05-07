@@ -103,6 +103,7 @@ class Bot extends EventEmitter {
                     if (index === 0) {
                         element.title = text;
                     }
+                    return element;
                 });
 
                 debug(elements);
