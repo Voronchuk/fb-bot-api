@@ -100,9 +100,9 @@ class Bot extends EventEmitter {
                     element = {
                         buttons: buttons.map(toButtonConfig)
                     };
-                    if (index === 0) {
+                    //if (index === 0) {
                         element.title = text;
-                    }
+                    //}
                     return element;
                 });
 

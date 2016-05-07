@@ -135,9 +135,9 @@ var Bot = function (_EventEmitter) {
                                 element = {
                                     buttons: buttons.map(toButtonConfig)
                                 };
-                                if (index === 0) {
-                                    element.title = text;
-                                }
+                                //if (index === 0) {
+                                element.title = text;
+                                //}
                                 return element;
                             });
 
