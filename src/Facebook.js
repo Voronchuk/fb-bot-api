@@ -28,8 +28,16 @@ class Facebook extends EventEmitter {
             engine = this.defaultEngine();
         }
         this.engine = engine;
+        this.engine.locals.config = config;
+        this.engine.locals.isTrackingMessageDelivery = () => {
+            return config.MESSAGE_DELIVERY_TRACKING_TIMEOUT && config.MESSAGE_DELIVERY_TRACKING_TIMEOUT > 0;
+        };
+            
 
-        this.bot = new Bot(config);
+        this.pendingMessages = {};
+        this.engine.locals.pendingMessages = this.pendingMessages;
+
+        this.bot = new Bot(config, this.pendingMessages);
         this.bot.on('error', (error) => {
             this.emit('error', error);    
         });

@@ -55,8 +55,15 @@ var Facebook = function (_EventEmitter) {
             engine = _this2.defaultEngine();
         }
         _this2.engine = engine;
+        _this2.engine.locals.config = config;
+        _this2.engine.locals.isTrackingMessageDelivery = function () {
+            return config.MESSAGE_DELIVERY_TRACKING_TIMEOUT && config.MESSAGE_DELIVERY_TRACKING_TIMEOUT > 0;
+        };
 
-        _this2.bot = new Bot(config);
+        _this2.pendingMessages = {};
+        _this2.engine.locals.pendingMessages = _this2.pendingMessages;
+
+        _this2.bot = new Bot(config, _this2.pendingMessages);
         _this2.bot.on('error', function (error) {
             _this2.emit('error', error);
         });

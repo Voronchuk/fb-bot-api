@@ -30,10 +30,11 @@ class BotError extends Error {
 
 
 class Bot extends EventEmitter {
-    constructor(config) {
+    constructor(config, pendingMessages) {
         super();
         
         this.config = config;
+        this.pendingMessages = pendingMessages;
     }
     
 
@@ -50,7 +51,7 @@ class Bot extends EventEmitter {
         return request(reqOptions)
             .then((data) => {
                 if (_.isObject(data)) {
-                    debug('Server profile response: ' + JSON.stringify(data));
+                    debug('Server profile response', JSON.stringify(data));
                 }
                 
                 data.id = id;
@@ -66,8 +67,36 @@ class Bot extends EventEmitter {
     
     send(message) {
         let data = message.getData();
-        debug(JSON.stringify(data));
-        return this._call(this.config.FB_MESSAGE_URL, data);
+        debug('Sending', JSON.stringify(data));
+        
+        let response = this._call(this.config.FB_MESSAGE_URL, data);
+        
+        const deliveryTimeout = this.config.MESSAGE_DELIVERY_TRACKING_TIMEOUT;
+        if (!deliveryTimeout || deliveryTimeout < 1) {
+            return response;
+        }
+        
+        // Track if message was successfully delivered
+        let messageDelivery = response.then((responseData) => {
+            if (responseData.message_id) {
+                return new Promise((resolve, reject) => {
+                    let cleanup = () => {
+                        delete this.pendingMessages[responseData.message_id];
+                    };
+                    
+                    this.pendingMessages[responseData.message_id] = [resolve, reject, cleanup];
+
+                    setTimeout(() => {
+                        cleanup();
+                        reject(BotError.wrap(new Error(`Message delivery timeout ${deliveryTimeout}`)));
+                    }, deliveryTimeout);
+                });
+            }
+            else {
+                return Promise.reject(BotError.wrap(new Error('Message delivery error, no confirmation signature in server response!')));
+            }
+        });
+        return Promise.all[response, messageDelivery];
     }
     
     sendText(userId, text, keyboardOptions = null) {
@@ -164,7 +193,7 @@ class Bot extends EventEmitter {
         return request(reqOptions)
             .then((data) => {
                 if (_.isObject(data)) {
-                    debug('Server response: ' + JSON.stringify(data));
+                    debug('Server response', JSON.stringify(data));
                 }
                 
                 return Promise.resolve(data);

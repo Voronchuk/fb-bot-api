@@ -55,12 +55,13 @@ var BotError = function (_Error) {
 var Bot = function (_EventEmitter) {
     _inherits(Bot, _EventEmitter);
 
-    function Bot(config) {
+    function Bot(config, pendingMessages) {
         _classCallCheck(this, Bot);
 
         var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(Bot).call(this));
 
         _this2.config = config;
+        _this2.pendingMessages = pendingMessages;
         return _this2;
     }
 
@@ -80,7 +81,7 @@ var Bot = function (_EventEmitter) {
 
             return request(reqOptions).then(function (data) {
                 if (_.isObject(data)) {
-                    debug('Server profile response: ' + JSON.stringify(data));
+                    debug('Server profile response', JSON.stringify(data));
                 }
 
                 data.id = id;
@@ -94,14 +95,43 @@ var Bot = function (_EventEmitter) {
     }, {
         key: 'send',
         value: function send(message) {
+            var _this4 = this;
+
             var data = message.getData();
-            debug(JSON.stringify(data));
-            return this._call(this.config.FB_MESSAGE_URL, data);
+            debug('Sending', JSON.stringify(data));
+
+            var response = this._call(this.config.FB_MESSAGE_URL, data);
+
+            var deliveryTimeout = this.config.MESSAGE_DELIVERY_TRACKING_TIMEOUT;
+            if (!deliveryTimeout || deliveryTimeout < 1) {
+                return response;
+            }
+
+            // Track if message was successfully delivered
+            var messageDelivery = response.then(function (responseData) {
+                if (responseData.message_id) {
+                    return new Promise(function (resolve, reject) {
+                        var cleanup = function cleanup() {
+                            delete _this4.pendingMessages[responseData.message_id];
+                        };
+
+                        _this4.pendingMessages[responseData.message_id] = [resolve, reject, cleanup];
+
+                        setTimeout(function () {
+                            cleanup();
+                            reject(BotError.wrap(new Error('Message delivery timeout ' + deliveryTimeout)));
+                        }, deliveryTimeout);
+                    });
+                } else {
+                    return Promise.reject(BotError.wrap(new Error('Message delivery error, no confirmation signature in server response!')));
+                }
+            });
+            return Promise.all[(response, messageDelivery)];
         }
     }, {
         key: 'sendText',
         value: function sendText(userId, text) {
-            var _this4 = this;
+            var _this5 = this;
 
             var keyboardOptions = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
 
@@ -144,7 +174,7 @@ var Bot = function (_EventEmitter) {
                             debug(elements);
                             return {
                                 v: {
-                                    v: _this4.send(new StructuredMessage(userId, 'generic', {
+                                    v: _this5.send(new StructuredMessage(userId, 'generic', {
                                         elements: elements
                                     }))
                                 }
@@ -157,7 +187,7 @@ var Bot = function (_EventEmitter) {
                     // Normal message with up to 3 buttons
                     else {
                             return {
-                                v: _this4.send(new StructuredMessage(userId, 'button', {
+                                v: _this5.send(new StructuredMessage(userId, 'button', {
                                     text: text,
                                     buttons: keyboardOptions.map(toButtonConfig)
                                 }))
@@ -173,7 +203,7 @@ var Bot = function (_EventEmitter) {
     }, {
         key: 'sendImage',
         value: function sendImage(userId, filePath) {
-            var _this5 = this;
+            var _this6 = this;
 
             return new Promise(function (resolve, reject) {
                 fs.readFile(filePath, function (error, data) {
@@ -184,13 +214,13 @@ var Bot = function (_EventEmitter) {
                     resolve(data);
                 });
             }).then(function (data) {
-                return _this5.send(new ImageMessage(userId, data));
+                return _this6.send(new ImageMessage(userId, data));
             });
         }
     }, {
         key: '_call',
         value: function _call(url, data) {
-            var _this6 = this;
+            var _this7 = this;
 
             var type = arguments.length <= 2 || arguments[2] === undefined ? 'POST' : arguments[2];
 
@@ -214,12 +244,12 @@ var Bot = function (_EventEmitter) {
 
             return request(reqOptions).then(function (data) {
                 if (_.isObject(data)) {
-                    debug('Server response: ' + JSON.stringify(data));
+                    debug('Server response', JSON.stringify(data));
                 }
 
                 return Promise.resolve(data);
             }).catch(function (error) {
-                _this6.emit('error', error);
+                _this7.emit('error', error);
 
                 return Promise.reject(BotError.wrap(error));
             });
