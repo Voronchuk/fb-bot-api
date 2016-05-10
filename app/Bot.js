@@ -118,8 +118,10 @@ var Bot = function (_EventEmitter) {
                         _this4.pendingMessages[responseData.message_id] = [resolve, reject, cleanup];
 
                         setTimeout(function () {
-                            cleanup();
-                            reject(BotError.wrap(new Error('Message delivery timeout ' + deliveryTimeout)));
+                            if (_this4.pendingMessages[responseData.message_id]) {
+                                cleanup();
+                                reject(BotError.wrap(new Error('Message delivery timeout ' + deliveryTimeout)));
+                            }
                         }, deliveryTimeout);
                     });
                 } else {
@@ -222,19 +224,25 @@ var Bot = function (_EventEmitter) {
                     json: data
                 };
             } else {
-                reqOptions = {
-                    uri: url + '/me/messages',
-                    qs: { access_token: this.config.PROFILE_TOKEN },
-                    method: type,
-                    json: data
-                };
-            }
-
-            if (data.filedata) {
-                reqOptions.form = {
-                    filedata: fs.createReadStream(data.filedata)
-                };
-                delete reqOptions.json.filedata;
+                if (data.filedata) {
+                    reqOptions = {
+                        uri: url + '/me/messages',
+                        qs: { access_token: this.config.PROFILE_TOKEN },
+                        method: type,
+                        form: {
+                            recipient: JSON.stringify(data.recipient),
+                            message: JSON.stringify(data.message),
+                            filedata: fs.createReadStream(data.filedata)
+                        }
+                    };
+                } else {
+                    reqOptions = {
+                        uri: url + '/me/messages',
+                        qs: { access_token: this.config.PROFILE_TOKEN },
+                        method: type,
+                        json: data
+                    };
+                }
             }
 
             return request(reqOptions).then(function (data) {

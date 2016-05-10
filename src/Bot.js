@@ -87,8 +87,10 @@ class Bot extends EventEmitter {
                     this.pendingMessages[responseData.message_id] = [resolve, reject, cleanup];
 
                     setTimeout(() => {
-                        cleanup();
-                        reject(BotError.wrap(new Error(`Message delivery timeout ${deliveryTimeout}`)));
+                        if (this.pendingMessages[responseData.message_id]) {
+                            cleanup();
+                            reject(BotError.wrap(new Error(`Message delivery timeout ${deliveryTimeout}`)));
+                        }
                     }, deliveryTimeout);
                 });
             }
@@ -171,20 +173,29 @@ class Bot extends EventEmitter {
             }
         } 
         else {
-            reqOptions = {
-                uri: url + '/me/messages',
-                qs: {access_token: this.config.PROFILE_TOKEN},
-                method: type,
-                json: data
+            if (data.filedata) {
+                reqOptions = {
+                    uri: url + '/me/messages',
+                    qs: {access_token: this.config.PROFILE_TOKEN},
+                    method: type,
+                    form: {
+                        recipient: JSON.stringify(data.recipient),
+                        message: JSON.stringify(data.message),
+                        filedata: fs.createReadStream(data.filedata)
+                    }
+                };
+            }
+            else {
+                reqOptions = {
+                    uri: url + '/me/messages',
+                    qs: {access_token: this.config.PROFILE_TOKEN},
+                    method: type,
+                    json: data
+                }
             }
         }
         
-        if (data.filedata) {
-            reqOptions.form = {
-                filedata: fs.createReadStream(data.filedata)
-            };
-            delete reqOptions.json.filedata;
-        }
+        
 
         return request(reqOptions)
             .then((data) => {
