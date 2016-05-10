@@ -155,24 +155,13 @@ class Bot extends EventEmitter {
     }
     
     sendImage(userId, filePath) {
-        return new Promise((resolve, reject) => {
-            fs.readFile(filePath, (error, data) => {
-                if (error) {
-                    return reject(BotError.wrap(error));
-                }
-                
-                resolve(data);
-            });
-        })
-            .then((data) => {
-                return this.send(new ImageMessage(userId, data));
-            });
+        return this.send(new ImageMessage(userId, filePath));
     }
     
 
     _call(url, data, type = 'POST') {
         let reqOptions;
-
+        
         if (data['setting_type'] === 'call_to_actions') {
             reqOptions = {
                 uri: url + '/' + this.config.PAGE_ID +'/thread_settings',
@@ -188,6 +177,13 @@ class Bot extends EventEmitter {
                 method: type,
                 json: data
             }
+        }
+        
+        if (data.filedata) {
+            reqOptions.form = {
+                filedata: fs.createReadStream(data.filedata)
+            };
+            delete reqOptions.json.filedata;
         }
 
         return request(reqOptions)

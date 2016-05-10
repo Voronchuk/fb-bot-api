@@ -203,24 +203,12 @@ var Bot = function (_EventEmitter) {
     }, {
         key: 'sendImage',
         value: function sendImage(userId, filePath) {
-            var _this6 = this;
-
-            return new Promise(function (resolve, reject) {
-                fs.readFile(filePath, function (error, data) {
-                    if (error) {
-                        return reject(BotError.wrap(error));
-                    }
-
-                    resolve(data);
-                });
-            }).then(function (data) {
-                return _this6.send(new ImageMessage(userId, data));
-            });
+            return this.send(new ImageMessage(userId, filePath));
         }
     }, {
         key: '_call',
         value: function _call(url, data) {
-            var _this7 = this;
+            var _this6 = this;
 
             var type = arguments.length <= 2 || arguments[2] === undefined ? 'POST' : arguments[2];
 
@@ -242,6 +230,13 @@ var Bot = function (_EventEmitter) {
                 };
             }
 
+            if (data.filedata) {
+                reqOptions.form = {
+                    filedata: fs.createReadStream(data.filedata)
+                };
+                delete reqOptions.json.filedata;
+            }
+
             return request(reqOptions).then(function (data) {
                 if (_.isObject(data)) {
                     debug('Server response', JSON.stringify(data));
@@ -249,7 +244,7 @@ var Bot = function (_EventEmitter) {
 
                 return Promise.resolve(data);
             }).catch(function (error) {
-                _this7.emit('error', error);
+                _this6.emit('error', error);
 
                 return Promise.reject(BotError.wrap(error));
             });
