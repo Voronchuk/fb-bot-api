@@ -98,7 +98,7 @@ class Bot extends EventEmitter {
                 return Promise.reject(BotError.wrap(new Error('Message delivery error, no confirmation signature in server response!')));
             }
         });
-        return Promise.all[response, messageDelivery];
+        return Promise.all([response, messageDelivery]);
     }
     
     sendText(userId, text, keyboardOptions = null) {
@@ -178,7 +178,7 @@ class Bot extends EventEmitter {
                     uri: url + '/me/messages',
                     qs: {access_token: this.config.PROFILE_TOKEN},
                     method: type,
-                    form: {
+                    formData: {
                         recipient: JSON.stringify(data.recipient),
                         message: JSON.stringify(data.message),
                         filedata: fs.createReadStream(data.filedata)
