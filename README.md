@@ -35,7 +35,9 @@ var config = {
     VERIFY_TOKEN: '...',
     APP_ID: '...',
     PAGE_ID: '...',
-    PROFILE_TOKEN: '...'
+    PROFILE_TOKEN: '...',
+    
+    MESSAGE_DELIVERY_TRACKING_TIMEOUT: 30000 // Optional settings which enables tracking a delivery of sent messages
 };
 ```
 
@@ -50,7 +52,15 @@ instance.on('message', function (sender, message) {
 instance.on('message-image', function (sender, imageUrl) {
     ...
 });
+instance.on('message-postback', function (sender, postback) {
+    ...
+});
 instance.on('error', function (error) {
+    ...
+});
+
+// If MESSAGE_DELIVERY_TRACKING_TIMEOUT is set
+instance.on('message-delivered', function (sender, signature) {
     ...
 });
 
