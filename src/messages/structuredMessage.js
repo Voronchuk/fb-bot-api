@@ -10,7 +10,9 @@ module.exports = class StructuredMessage {
      * @param $data
      */
     constructor(recipient, type, data){
-        this.recipient = recipient;
+        if (recipient) {
+            this.recipient = recipient;
+        }
         this.type = type;
 
         switch (type){
@@ -37,13 +39,25 @@ module.exports = class StructuredMessage {
                 break;
         }
     }
+    
+    isSupportedType(type) {
+        switch (type) {
+            case 'button':
+            case 'generic':
+            case 'receipt':
+                return true;
+                
+            default:
+                return false;
+        }
+    }
 
     /**
      * Get Data
      *
      * @return object
      */
-    getData(){
+    getData() {
         let result;
         let btns = [];
         let elements = [];
@@ -102,6 +116,12 @@ module.exports = class StructuredMessage {
                 break;
         }
         
+        
+        if (!this.recipient) {
+            return {
+                message: result
+            };
+        }
         return {
             recipient: {
                 id: this.recipient

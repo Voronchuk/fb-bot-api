@@ -1,5 +1,6 @@
 'use strict';
 
+
 module.exports = class Message {
     constructor(recipient, text) {
         this.rec = recipient;
@@ -11,7 +12,7 @@ module.exports = class Message {
             recipient: {
                 id: this.rec
             },
-            message    : {
+            message: {
                 text: this.txt
             }
         };

@@ -1,12 +1,5 @@
 'use strict';
 
-/**
- * MessageButton constructor.
- *
- * @param $type Type
- * @param $title Title
- * @param string $url Url or postback
- */
 module.exports = class MessageButton {
     constructor(type, title, url = '') {
         this.type = type;

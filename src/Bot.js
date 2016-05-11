@@ -10,9 +10,9 @@ const Message = require('./messages/Message');
 const ImageMessage = require('./messages/ImageMessage');
 const StructuredMessage = require('./messages/StructuredMessage');
 const MessageButton = require('./messages/MessageButton');
+const WelcomeMessage = require('./messages/WelcomeMessage');
 
-/*const WelcomeMessage = require('./messages/welcomeMessage');
-const MessageElement = require('./messages/messageElement');
+/*const MessageElement = require('./messages/messageElement');
 const Adjustment = require('./messages/adjustment');
 const Address = require('./messages/address');
 const Summary = require('./messages/summary');
@@ -101,53 +101,40 @@ class Bot extends EventEmitter {
         return Promise.all([response, messageDelivery]);
     }
     
-    sendText(userId, text, keyboardOptions = null) {
+    setWelcome(text, keyboardOptions = null) {
         if (keyboardOptions) {
-            const toButtonConfig = (buttonOptions) => {
-                if (buttonOptions.type === 'web_url') {
-                    return new MessageButton(buttonOptions.type, buttonOptions.label, buttonOptions.content);
-                }
-                else {
-                    return new MessageButton(buttonOptions.type, buttonOptions.label);
-                }
-            };
+            let keyboardButtons = this._parseKeyboardOptions(keyboardOptions);
             
-            // Cut message to horizontal blocks with 3 buttons
             if (keyboardOptions.length > 3) {
-                let elements = [], temparray = [];
-                let element = {};
-
-                keyboardOptions = keyboardOptions.reduce((acc, button, index) => {
-                    if (index % 3 === 0) {
-                        acc.push([button]);
-                    }
-                    else {
-                        acc[acc.length - 1].push(button);
-                    }
-                    return acc;
-                }, []);
-                
-                elements = keyboardOptions.map((buttons, index) => {
-                    element = {
-                        buttons: buttons.map(toButtonConfig)
-                    };
-                    //if (index === 0) {
-                        element.title = text;
-                    //}
-                    return element;
-                });
-
-                debug(elements);
-                return this.send(new StructuredMessage(userId, 'generic', {
-                    elements: elements      
+                return this.send(new WelcomeMessage('generic', {
+                    elements: keyboardButtons      
                 }));
             }
+            else {
+                return this.send(new WelcomeMessage('button', {
+                    text: text,
+                    buttons: keyboardButtons     
+                }));
+            }
+        }
+        else {
+            return this.send(new WelcomeMessage(text));
+        }
+    }
+    
+    sendText(userId, text, keyboardOptions = null) {
+        if (keyboardOptions) {
+            let keyboardButtons = this._parseKeyboardOptions(keyboardOptions);
             
-            // Normal message with up to 3 buttons
+            if (keyboardOptions.length > 3) {
+                return this.send(new StructuredMessage(userId, 'generic', {
+                    elements: keyboardButtons      
+                }));
+            }
             else {
                 return this.send(new StructuredMessage(userId, 'button', {
                     text: text,
-                    buttons: keyboardOptions.map(toButtonConfig)     
+                    buttons: keyboardButtons     
                 }));
             }
         }
@@ -160,6 +147,50 @@ class Bot extends EventEmitter {
         return this.send(new ImageMessage(userId, filePath));
     }
     
+
+    _parseKeyboardOptions(keyboardOptions) {
+        const toButtonConfig = (buttonOptions) => {
+            if (buttonOptions.type === 'web_url') {
+                return new MessageButton(buttonOptions.type, buttonOptions.label, buttonOptions.content);
+            }
+            else {
+                return new MessageButton(buttonOptions.type, buttonOptions.label);
+            }
+        };
+        
+        // Cut message to horizontal blocks with 3 buttons
+        if (keyboardOptions.length > 3) {
+            let elements = [], temparray = [];
+            let element = {};
+
+            keyboardOptions = keyboardOptions.reduce((acc, button, index) => {
+                if (index % 3 === 0) {
+                    acc.push([button]);
+                }
+                else {
+                    acc[acc.length - 1].push(button);
+                }
+                return acc;
+            }, []);
+            
+            elements = keyboardOptions.map((buttons, index) => {
+                element = {
+                    buttons: buttons.map(toButtonConfig)
+                };
+
+                element.title = text;
+                return element;
+            });
+
+            debug(elements);
+            return elements;
+        }
+        
+        // Normal message with up to 3 buttons
+        else {
+            return keyboardOptions.map(toButtonConfig);
+        }
+    }
 
     _call(url, data, type = 'POST') {
         let reqOptions;

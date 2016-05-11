@@ -16,7 +16,9 @@ module.exports = function () {
     function StructuredMessage(recipient, type, data) {
         _classCallCheck(this, StructuredMessage);
 
-        this.recipient = recipient;
+        if (recipient) {
+            this.recipient = recipient;
+        }
         this.type = type;
 
         switch (type) {
@@ -44,14 +46,27 @@ module.exports = function () {
         }
     }
 
-    /**
-     * Get Data
-     *
-     * @return object
-     */
-
-
     _createClass(StructuredMessage, [{
+        key: 'isSupportedType',
+        value: function isSupportedType(type) {
+            switch (type) {
+                case 'button':
+                case 'generic':
+                case 'receipt':
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        /**
+         * Get Data
+         *
+         * @return object
+         */
+
+    }, {
         key: 'getData',
         value: function getData() {
             var result = void 0;
@@ -113,6 +128,11 @@ module.exports = function () {
                     break;
             }
 
+            if (!this.recipient) {
+                return {
+                    message: result
+                };
+            }
             return {
                 recipient: {
                     id: this.recipient

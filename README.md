@@ -65,6 +65,38 @@ instance.on('message-delivered', function (sender, signature) {
 });
 
 this.instance.listen();
+
+
+// Welcome message
+this.instance.bot.setWelcome('Hello world!');
+this.instance.bot.setWelcome('Hello world!', [
+    {
+        type: 'postback',
+        label: 'Start'
+    },
+    {
+        type: 'postback',
+        label: 'End'
+    }
+]);
+
+// Normal messages with and without links
+this.instance.bot.sendText(facebookUserId, 'Some message');
+this.instance.bot.sendText(facebookUserId, 'Some message', [
+    {
+        type: 'postback',
+        label: 'Answer'
+    },
+    {
+        type: 'web_url',
+        label: 'Google',
+        content: 'https://google.com'
+    }
+]);
+
+// Image messages
+this.instance.bot.sendImage(facebookUserId, 'https://images.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png');
+this.instance.bot.sendImage(facebookUserId, '/local/path/to/file.png');
 ```
 
 By default the system initialise Express 4 web-server instance to listen for FB Messenger webhook messages, if thats an overkill for you can pass custom web-server engine as the second param of FacebookBot constructor, like `new FacebookBot(config, express())`.
