@@ -143,21 +143,61 @@ class Bot extends EventEmitter {
         }
     }
     
+    sendItems(userId, items) {
+        if (_.isEmpty(items) || !_.isArray(items)) {
+            return Promise.reject(new Error('Items should be an array with 1-3 item configs'));
+        }
+        
+        let element = {};
+        try {
+            let elements = items.map((options) => {
+                element = {};
+                if (_.isString(options.title) && !_.isEmpty(options.title)) {
+                    element.title = options.title;
+                }
+                if (_.isString(options.subtitle) && !_.isEmpty(options.subtitle)) {
+                    element.subtitle = options.subtitle;
+                }
+                if (_.isString(options.item_url) && !_.isEmpty(options.item_url)) {
+                    element.item_url = options.item_url;
+                }
+                if (_.isString(options.image_url) && !_.isEmpty(options.image_url)) {
+                    element.image_url = options.image_url;
+                }
+                if (options.buttons && _.isArray(options.buttons)) {
+                    if (options.buttons.length > 3) {
+                        throw new Error('No more than 3 buttons per message are allowed!');
+                    }
+                    
+                    element.buttons = options.buttons.map(this._toButtonConfig);
+                }
+                return element;
+            });
+            
+            return this.send(new StructuredMessage(userId, 'generic', {
+                elements: elements      
+            }));
+        }
+        catch (error) {
+            return Promise.reject(error);
+        }
+    }
+    
     sendImage(userId, filePath) {
         return this.send(new ImageMessage(userId, filePath));
     }
     
-
+    
+    _toButtonConfig(buttonOptions) {
+        if (buttonOptions.type === 'web_url') {
+            return new MessageButton(buttonOptions.type, buttonOptions.label, buttonOptions.content);
+        }
+        else {
+            return new MessageButton(buttonOptions.type, buttonOptions.label);
+        }
+    }
+    
     _parseKeyboardOptions(keyboardOptions) {
-        const toButtonConfig = (buttonOptions) => {
-            if (buttonOptions.type === 'web_url') {
-                return new MessageButton(buttonOptions.type, buttonOptions.label, buttonOptions.content);
-            }
-            else {
-                return new MessageButton(buttonOptions.type, buttonOptions.label);
-            }
-        };
-        
         // Cut message to horizontal blocks with 3 buttons
         if (keyboardOptions.length > 3) {
             let elements = [], temparray = [];
@@ -175,7 +215,7 @@ class Bot extends EventEmitter {
             
             elements = keyboardOptions.map((buttons, index) => {
                 element = {
-                    buttons: buttons.map(toButtonConfig)
+                    buttons: buttons.map(this._toButtonConfig)
                 };
 
                 element.title = text;
@@ -188,7 +228,7 @@ class Bot extends EventEmitter {
         
         // Normal message with up to 3 buttons
         else {
-            return keyboardOptions.map(toButtonConfig);
+            return keyboardOptions.map(this._toButtonConfig);
         }
     }
 

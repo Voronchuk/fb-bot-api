@@ -97,6 +97,44 @@ this.instance.bot.sendText(facebookUserId, 'Some message', [
 // Image messages
 this.instance.bot.sendImage(facebookUserId, 'https://images.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png');
 this.instance.bot.sendImage(facebookUserId, '/local/path/to/file.png');
+
+// Structured messages with horizontal scrolling
+this.instance.bot.sendItems(facebookUserId, [
+    {
+        title: "Welcome to My Company #1!",
+        item_url: "https://www.petersbowlerhats.com",
+        image_url: "https://www.petersbowlerhats.com/img/hat.jpeg",
+        subtitle: "We have the right hat for everyone.",
+        buttons: [
+            {
+                type: "web_url",
+                label: "View Website 1",
+                content: "https://www.petersbowlerhats.com"
+            },
+            {
+                type: "postback",
+                label: "Start Chatting 1"
+            }
+        ]
+    },
+    {
+        title: "Welcome to My Company #2!",
+        item_url: "https://www.petersbowlerhats.com",
+        image_url: "https://www.petersbowlerhats.com/img/hat.jpeg",
+        subtitle: "We have the right hat for everyone.",
+        buttons: [
+            {
+                type: "web_url",
+                label: "View Website 2",
+                content: "https://www.petersbowlerhats.com"
+            },
+            {
+                type: "postback",
+                label: "Start Chatting 2"
+            }
+        ]
+    }
+]);
 ```
 
 By default the system initialise Express 4 web-server instance to listen for FB Messenger webhook messages, if thats an overkill for you can pass custom web-server engine as the second param of FacebookBot constructor, like `new FacebookBot(config, express())`.
