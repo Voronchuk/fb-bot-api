@@ -175,20 +175,65 @@ var Bot = function (_EventEmitter) {
             }
         }
     }, {
+        key: 'sendItems',
+        value: function sendItems(userId, items) {
+            var _this5 = this;
+
+            if (_.isEmpty(items) || !_.isArray(items)) {
+                return Promise.reject(new Error('Items should be an array with 1-3 item configs'));
+            }
+
+            var element = {};
+            try {
+                var elements = items.map(function (options) {
+                    element = {};
+                    if (_.isString(options.title) && !_.isEmpty(options.title)) {
+                        element.title = options.title;
+                    }
+                    if (_.isString(options.subtitle) && !_.isEmpty(options.subtitle)) {
+                        element.subtitle = options.subtitle;
+                    }
+                    if (_.isString(options.item_url) && !_.isEmpty(options.item_url)) {
+                        element.item_url = options.item_url;
+                    }
+                    if (_.isString(options.image_url) && !_.isEmpty(options.image_url)) {
+                        element.image_url = options.image_url;
+                    }
+                    if (options.buttons && _.isArray(options.buttons)) {
+                        if (options.buttons.length > 3) {
+                            throw new Error('No more than 3 buttons per message are allowed!');
+                        }
+
+                        element.buttons = options.buttons.map(_this5._toButtonConfig);
+                    }
+                    return element;
+                });
+
+                return this.send(new StructuredMessage(userId, 'generic', {
+                    elements: elements
+                }));
+            } catch (error) {
+                return Promise.reject(error);
+            }
+        }
+    }, {
         key: 'sendImage',
         value: function sendImage(userId, filePath) {
             return this.send(new ImageMessage(userId, filePath));
         }
     }, {
+        key: '_toButtonConfig',
+        value: function _toButtonConfig(buttonOptions) {
+            if (buttonOptions.type === 'web_url') {
+                return new MessageButton(buttonOptions.type, buttonOptions.label, buttonOptions.content);
+            } else {
+                return new MessageButton(buttonOptions.type, buttonOptions.label);
+            }
+        }
+    }, {
         key: '_parseKeyboardOptions',
         value: function _parseKeyboardOptions(keyboardOptions) {
-            var toButtonConfig = function toButtonConfig(buttonOptions) {
-                if (buttonOptions.type === 'web_url') {
-                    return new MessageButton(buttonOptions.type, buttonOptions.label, buttonOptions.content);
-                } else {
-                    return new MessageButton(buttonOptions.type, buttonOptions.label);
-                }
-            };
+            var _this6 = this;
 
             // Cut message to horizontal blocks with 3 buttons
             if (keyboardOptions.length > 3) {
@@ -208,7 +253,7 @@ var Bot = function (_EventEmitter) {
 
                     elements = keyboardOptions.map(function (buttons, index) {
                         element = {
-                            buttons: buttons.map(toButtonConfig)
+                            buttons: buttons.map(_this6._toButtonConfig)
                         };
 
                         element.title = text;
@@ -226,13 +271,13 @@ var Bot = function (_EventEmitter) {
 
             // Normal message with up to 3 buttons
             else {
-                    return keyboardOptions.map(toButtonConfig);
+                    return keyboardOptions.map(this._toButtonConfig);
                 }
         }
     }, {
         key: '_call',
         value: function _call(url, data) {
-            var _this5 = this;
+            var _this7 = this;
 
             var type = arguments.length <= 2 || arguments[2] === undefined ? 'POST' : arguments[2];
 
@@ -274,7 +319,7 @@ var Bot = function (_EventEmitter) {
 
                 return Promise.resolve(data);
             }).catch(function (error) {
-                _this5.emit('error', error);
+                _this7.emit('error', error);
 
                 return Promise.reject(BotError.wrap(error));
             });
