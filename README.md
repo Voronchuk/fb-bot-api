@@ -18,7 +18,7 @@ Use this library to communicate with the Facebook Messenger API to develop a bot
 
 ## License 
 
-The Facebook Messenger bot library is released under the terms of the MIT license. See [License](LICENSE.md) for more information or see https://opensource.org/licenses/MIT.
+The Facebook Messenger bot library is released under the terms of the MIT license. See [License](LICENSE) for more information or see https://opensource.org/licenses/MIT.
 
 ## Process
 
