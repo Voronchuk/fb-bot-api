@@ -1,10 +1,10 @@
 'use strict';
 
 module.exports = class MessageButton {
-    constructor(type, title, url = '') {
+    constructor(type, title, content = '') {
         this.type = type;
         this.title = title;
-        this.url = url;
+        this.content = content;
     }
 
     getData(){
@@ -17,11 +17,11 @@ module.exports = class MessageButton {
 
         switch (this.type) {
             case 'postback':
-                result['payload'] = this.title;
+                result['payload'] = this.content.length > 0 ? this.content : this.title;
                 break;
                 
             case 'web_url':
-                result['url'] = this.url;
+                result['url'] = this.content;
                 break;
         }
 

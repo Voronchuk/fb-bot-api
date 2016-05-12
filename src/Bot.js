@@ -193,7 +193,7 @@ class Bot extends EventEmitter {
             return new MessageButton(buttonOptions.type, buttonOptions.label, buttonOptions.content);
         }
         else {
-            return new MessageButton(buttonOptions.type, buttonOptions.label);
+            return new MessageButton(buttonOptions.type, buttonOptions.label, buttonOptions.content);
         }
     }
     
