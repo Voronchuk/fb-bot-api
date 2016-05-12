@@ -189,12 +189,7 @@ class Bot extends EventEmitter {
     
     
     _toButtonConfig(buttonOptions) {
-        if (buttonOptions.type === 'web_url') {
-            return new MessageButton(buttonOptions.type, buttonOptions.label, buttonOptions.content);
-        }
-        else {
-            return new MessageButton(buttonOptions.type, buttonOptions.label, buttonOptions.content);
-        }
+        return new MessageButton(buttonOptions.type, buttonOptions.label, buttonOptions.content);
     }
     
     _parseKeyboardOptions(keyboardOptions) {
