@@ -224,11 +224,7 @@ var Bot = function (_EventEmitter) {
     }, {
         key: '_toButtonConfig',
         value: function _toButtonConfig(buttonOptions) {
-            if (buttonOptions.type === 'web_url') {
-                return new MessageButton(buttonOptions.type, buttonOptions.label, buttonOptions.content);
-            } else {
-                return new MessageButton(buttonOptions.type, buttonOptions.label);
-            }
+            return new MessageButton(buttonOptions.type, buttonOptions.label, buttonOptions.content);
         }
     }, {
         key: '_parseKeyboardOptions',

@@ -6,13 +6,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 module.exports = function () {
     function MessageButton(type, title) {
-        var url = arguments.length <= 2 || arguments[2] === undefined ? '' : arguments[2];
+        var content = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
 
         _classCallCheck(this, MessageButton);
 
         this.type = type;
         this.title = title;
-        this.url = url;
+        this.content = content ? content : title;
     }
 
     _createClass(MessageButton, [{
@@ -27,11 +27,11 @@ module.exports = function () {
 
             switch (this.type) {
                 case 'postback':
-                    result['payload'] = this.title;
+                    result['payload'] = this.content;
                     break;
 
                 case 'web_url':
-                    result['url'] = this.url;
+                    result['url'] = this.content;
                     break;
             }
 
