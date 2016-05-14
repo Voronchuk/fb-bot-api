@@ -1,0 +1,5 @@
+--reporter spec
+--colors
+--timeout 100000
+--require should
+--recursive

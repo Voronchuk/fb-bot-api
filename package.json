@@ -6,13 +6,18 @@
   "repository": "voronchuk/fb-bot-api",
   "license": "MIT",
   "private": false,
+  "scripts": {
+    "test": "./node_modules/.bin/mocha test/index.js"
+  },
   "dependencies": {
-    "debug": "^2.2.0",
     "body-parser": "^1.15.0",
+    "chai": "^3.5.0",
+    "debug": "^2.2.0",
     "express": "^4.13.4",
     "handlebars": "^4.0.5",
     "hbs": "^4.0.0",
     "lodash": "^4.9.0",
+    "mocha": "^2.4.5",
     "request": "^2.72.0",
     "request-promise": "^3.0.0",
     "when": "^3.7.*"
