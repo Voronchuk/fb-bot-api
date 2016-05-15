@@ -64,12 +64,12 @@ instance.on('message-delivered', function (sender, signature) {
     ...
 });
 
-this.instance.listen();
+instance.listen();
 
 
 // Welcome message
-this.instance.bot.setWelcome('Hello world!');
-this.instance.bot.setWelcome('Hello world!', [
+instance.bot.setWelcome('Hello world!');
+instance.bot.setWelcome('Hello world!', [
     {
         type: 'postback',
         label: 'Start'
@@ -81,8 +81,8 @@ this.instance.bot.setWelcome('Hello world!', [
 ]);
 
 // Normal messages with and without links
-this.instance.bot.sendText(facebookUserId, 'Some message');
-this.instance.bot.sendText(facebookUserId, 'Some message', [
+instance.bot.sendText(facebookUserId, 'Some message');
+instance.bot.sendText(facebookUserId, 'Some message', [
     {
         type: 'postback',
         label: 'Answer'
@@ -95,11 +95,11 @@ this.instance.bot.sendText(facebookUserId, 'Some message', [
 ]);
 
 // Image messages
-this.instance.bot.sendImage(facebookUserId, 'https://images.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png');
-this.instance.bot.sendImage(facebookUserId, '/local/path/to/file.png');
+instance.bot.sendImage(facebookUserId, 'https://images.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png');
+instance.bot.sendImage(facebookUserId, '/local/path/to/file.png');
 
 // Structured messages with horizontal scrolling
-this.instance.bot.sendItems(facebookUserId, [
+instance.bot.sendItems(facebookUserId, [
     {
         title: "Welcome to My Company #1!",
         item_url: "https://www.petersbowlerhats.com",
