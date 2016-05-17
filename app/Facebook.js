@@ -97,12 +97,13 @@ var Facebook = function (_EventEmitter) {
             engine.use(config.WEBSERVER.URL_PREFIX, router);
 
             // Error handling
+            var self = this;
             engine.use(function (req, res) {
                 res.status(404).render('error404');
             });
             engine.use(function (error, req, res, next) {
                 debug('Uncatched error', error);
-                this.emit('error', error);
+                self.emit('error', error);
                 res.status(500).render('error500', error);
             });
 
