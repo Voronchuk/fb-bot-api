@@ -14,6 +14,7 @@ var express = require('express');
 var hbs = require('hbs');
 var bodyParser = require('body-parser');
 var EventEmitter = require('events');
+var debug = require('debug')('facebook');
 
 var Bot = require('./Bot.js').Bot;
 
@@ -100,6 +101,8 @@ var Facebook = function (_EventEmitter) {
                 res.status(404).render('error404');
             });
             engine.use(function (error, req, res, next) {
+                debug('Uncatched error', error);
+                this.emit('error', error);
                 res.status(500).render('error500', error);
             });
 
