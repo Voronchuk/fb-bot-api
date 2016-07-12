@@ -61,6 +61,8 @@ var parseMessage = function parseMessage(bot) {
                 msg.attachments.forEach(function (file) {
                     if (file.type === 'image') {
                         instance.emit('message-image', message.sender, file.payload.url);
+                    } else if (file.type === 'video') {
+                        instance.emit('message-video', message.sender, file.payload.url);
                     } else {
                         instance.emit('message-file', message.sender, file);
                     }
@@ -169,6 +171,8 @@ module.exports = function (instance) {
                     msg.attachments.forEach(function (file) {
                         if (file.type === 'image') {
                             instance.emit('message-image', sender, file.payload.url);
+                        } else if (file.type === 'video') {
+                            instance.emit('message-video', message.sender, file.payload.url);
                         } else {
                             instance.emit('message-file', sender, file);
                         }

@@ -8,6 +8,7 @@ const EventEmitter = require('events');
 
 const Message = require('./messages/Message');
 const ImageMessage = require('./messages/ImageMessage');
+const VideoMessage = require('./messages/videoMessage');
 const StructuredMessage = require('./messages/StructuredMessage');
 const MessageButton = require('./messages/MessageButton');
 const WelcomeMessage = require('./messages/WelcomeMessage');
@@ -185,6 +186,10 @@ class Bot extends EventEmitter {
     
     sendImage(userId, filePath) {
         return this.send(new ImageMessage(userId, filePath));
+    }
+    
+    sendVideo(userId, filePath) {
+        return this.send(new VideoMessage(userId, filePath));
     }
     
     

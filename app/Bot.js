@@ -20,6 +20,7 @@ var EventEmitter = require('events');
 
 var Message = require('./messages/Message');
 var ImageMessage = require('./messages/ImageMessage');
+var VideoMessage = require('./messages/videoMessage');
 var StructuredMessage = require('./messages/StructuredMessage');
 var MessageButton = require('./messages/MessageButton');
 var WelcomeMessage = require('./messages/WelcomeMessage');
@@ -220,6 +221,11 @@ var Bot = function (_EventEmitter) {
         key: 'sendImage',
         value: function sendImage(userId, filePath) {
             return this.send(new ImageMessage(userId, filePath));
+        }
+    }, {
+        key: 'sendVideo',
+        value: function sendVideo(userId, filePath) {
+            return this.send(new VideoMessage(userId, filePath));
         }
     }, {
         key: '_toButtonConfig',
