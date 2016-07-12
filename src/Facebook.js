@@ -4,6 +4,7 @@ const express = require('express');
 const hbs = require('hbs');
 const bodyParser = require('body-parser');
 const EventEmitter = require('events');
+const debug = require('debug')('facebook');
 
 const Bot = require('./Bot.js').Bot;
 
@@ -66,10 +67,13 @@ class Facebook extends EventEmitter {
         engine.use(config.WEBSERVER.URL_PREFIX, router);
         
         // Error handling
+        let self = this;
         engine.use(function(req, res) {
             res.status(404).render('error404');
         });
         engine.use(function(error, req, res, next) {
+            debug('Uncatched error', error);
+            self.emit('error', error);
             res.status(500).render('error500', error);
         });
 
