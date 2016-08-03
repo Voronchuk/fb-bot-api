@@ -103,7 +103,7 @@ var Facebook = function (_EventEmitter) {
             });
             engine.use(function (error, req, res, next) {
                 debug('Uncatched error', error);
-                self.emit('error', error);
+                self.emit('error', FacebookError.wrap(error));
                 res.status(500).render('error500', error);
             });
 

@@ -148,6 +148,20 @@ module.exports = function (instance) {
                         return Promise.reject('break');
                     }
 
+                    // Message read
+                    if (message.read) {
+                        instance.emit('message-read', message.sender, message.read);
+
+                        return Promise.reject('break');
+                    }
+
+                    // Facebook messenger button optin
+                    if (message.optin) {
+                        instance.emit('message-optin', message.sender, message.optin);
+
+                        return Promise.reject('break');
+                    }
+
                     if (!message.message) {
                         return Promise.reject(new Error('Unknown message recieved: ' + JSON.stringify(message)));
                     }
